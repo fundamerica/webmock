@@ -2,6 +2,12 @@
 
 ## 3.8.3
 
+  * Added request keyword, fixing support for HTTP.rb 5.x
+
+    Thanks to [Hiếu Nguyễn](https://github.com/hieuk09)
+
+## 3.8.3
+
   * Fixed problem introduced in version 3.4.2, which caused matching against Addressable::Template representing host part of the URI to raise an error.
 
     Thanks to [Vesa Laakso](https://github.com/valscion)

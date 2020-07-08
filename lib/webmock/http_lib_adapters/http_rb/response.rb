@@ -20,22 +20,41 @@ module HTTP
         # and 2.x use a positional argument, and 0.x don't support supplying
         # the encoding.
         body = if HTTP::VERSION < "1.0.0"
-          Body.new(Streamer.new(webmock_response.body))
-        elsif HTTP::VERSION < "3.0.0"
-          Body.new(Streamer.new(webmock_response.body), webmock_response.body.encoding)
-        else
-          Body.new(Streamer.new(webmock_response.body), encoding: webmock_response.body.encoding)
-        end
+                 Body.new(Streamer.new(webmock_response.body))
+               elsif HTTP::VERSION < "3.0.0"
+                 Body.new(Streamer.new(webmock_response.body), webmock_response.body.encoding)
+               else
+                 Body.new(Streamer.new(webmock_response.body), encoding: webmock_response.body.encoding)
+               end
 
         return new(status, "1.1", headers, body, uri) if HTTP::VERSION < "1.0.0"
 
+        if HTTP::VERSION > '5.0.0'
+          request = HTTP::Request.new({
+                                          version: '1.1',
+                                          verb: request_signature.method,
+                                          headers: request_signature.headers,
+                                          uri: uri,
+                                          body: request_signature.body
+                                      })
+
+          return new({
+                         status: status,
+                         version: '1.1',
+                         headers: headers,
+                         body: body,
+                         uri: uri,
+                         request: request
+                     })
+        end
+
         new({
-          status: status,
-          version: "1.1",
-          headers: headers,
-          body: body,
-          uri: uri
-        })
+                status: status,
+                version: "1.1",
+                headers: headers,
+                body: body,
+                uri: uri
+            })
       end
 
       private
